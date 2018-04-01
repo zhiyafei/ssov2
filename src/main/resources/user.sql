@@ -1,4 +1,4 @@
-## 用户表
+##   用户表
 CREATE  TABLE user (
 	user_id VARCHAR(32) NOT NULL COMMENT '用户id',
   user_name VARCHAR(32) NOT NULL COMMENT '用户名称',
