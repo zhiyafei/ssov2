@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<systems>
+	<system id="usermanager"  name="Test1 - www.sys1.com">
+		<baseUrl>//127.0.0.1:8089</baseUrl>
+		<homeUri>/http://127.0.0.1:8089</homeUri>
+		<innerAddress>http://127.0.0.1:8089</innerAddress>
+	</system>
+
+</systems>

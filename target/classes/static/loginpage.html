@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>login</title>
+    <script type="text/javascript" src="scripts/jquery.js"></script>
+    <script type="text/javascript" src="scripts/cookie_util.js"></script>
+    <script type="text/javascript" src="scripts/md5.js"></script>
+    <script type="text/javascript">
+
+        var UNAME_COOKIE_NAME = "lastLoginUserName";
+
+        $(function() {
+            $("#zhuce").click(function(event) {
+                var obj = {
+                    userName:$("#userName").val(),
+                    pwd:$("#pwd").val(),
+                    nickName:$("#nickName").val(),
+                    phone:$("#phone").val(),
+                    sex:$("#sex").val(),
+                    avatar:$("#avatar").val(),
+                }
+
+
+                $.ajax({
+                    url: 'http://localhost:8088/public/user/add',
+                    type: 'POST',
+                    async: true,
+                    data: JSON.stringify(obj),
+                    timeout: 5000, //超时时间
+                    contentType: 'application/json',
+                    beforeSend: function(xhr) {
+                        console.log('发送前')
+                    },
+                    success: function(data, textStatus, jqXHR) {
+                        callback.call(callback.context, data);
+
+                    },
+                    error: function(xhr, textStatus) {
+                        console.log('错误')
+                    },
+                    complete: function() {
+                        console.log('结束')
+                    }
+                })
+            });
+            // 如果name没有value，将cookie中存储过的name值写入
+            var eleName = $("input[name=name]");
+            eleName.val(Cookie.get(UNAME_COOKIE_NAME));
+
+            // 登录按钮被点击时记住当前name
+            $("form").submit(function() {
+                Cookie.set(UNAME_COOKIE_NAME, $.trim(eleName.val()), null, 7 * 24 * 60);
+
+                // 将密码字段使用 MD5(MD5(密码) + 验证码）编码后发给服务端
+                var elePasswd = $("input[name=pwd]");
+                var passwd = elePasswd.val();
+                elePasswd.val($.md5($.md5(passwd) + $("input[name=captcha]").val()));
+
+                $("input[name=backUrl]").val(window.location.search.substring(window.location.search.indexOf("?backUrl=")+9));
+
+
+
+            });
+
+            // 加载验证码
+            drawCaptcha();
+        });
+
+        function drawCaptcha() {
+            $.ajax("http://localhost:8088/preLogin").done(function(data) {
+                console.log(data);
+                $("#captchaImg").attr("src", data.imgData);
+            }).fail(function() {
+                alert("验证码加载失败");
+            });
+        }
+
+
+    </script>
+</head>
+<body>
+<div>
+ <h1>登录</h1>  
+  <form action="http://localhost:8088/login" method="post">
+
+    <p>账号：<input type="text" name="name" autocomplete="off" /></p>
+    <p>密码：<input type="password" name="pwd" autocomplete="off" /></p>
+    <p>验证码：<input style="width:80px;" type="text" name="captcha" autocomplete="off" />
+        <img src="" onclick="drawCaptcha();" id="captchaImg" style="cursor:pointer;"/>
+    </p>
+      <p><label><input type="checkbox" name="rememberMe" value="true"/>下次自动登录</label></p>
+    <p><input type="submit" value="登录" /></p>
+      <p>
+          <input type="text" name="backUrl">
+      </p>
+</form>
+</div>
+<div class="zhuce">
+ <h1>注册</h1>
+
+
+    <p>账号：<input type="text" id="userName"  autocomplete="off" value="1234567890" /></p>
+    <p>密码：<input type="password" id="pwd" autocomplete="off" value="1234567890" /></p>
+    <p>昵称<input type="text" id="nickName" autocomplete="off" value="asdfasdfdasafds"/></p>
+     <p>手机号<input type="text"  id="phone" autocomplete="off" value="18618230064" /></p>
+    <p>性别<input type="text"  id="sex" autocomplete="off" value="0"/></p>
+    <p>头像<input type="text"  id="avatar" autocomplete="off" value="http://www.baidu.com/loginpage.html" /></p>
+     <button type="button" id="zhuce">注册</button>
+
+</div>
+
+</body>
+</html>
